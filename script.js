@@ -14,7 +14,7 @@ window.onload = () => {
     const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
     camera.position.set(0, 0, 500);
 
-    const sphereGeometry = new THREE.SphereGeometry(10, 10, 10);
+    const sphereGeometry = new THREE.SphereGeometry(8, 32, 32);
     const sphereMaterial = new THREE.MeshStandardMaterial({
         map: new THREE.TextureLoader().load('naari3.png'),
         metalness: 0.05,
@@ -25,13 +25,13 @@ window.onload = () => {
     const sphereMeshMin = new THREE.Mesh(sphereGeometry, sphereMaterial);
     const sphereMeshHour = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphereMeshMin.scale.set(1.2, 1.2, 1.2);
-    sphereMeshHour.scale.set(1.5, 1.5, 1.5);
+    sphereMeshHour.scale.set(1.6, 1.6, 1.6);
     scene.add(sphereMeshSec);
     scene.add(sphereMeshMin);
     scene.add(sphereMeshHour);
 
     const sphereMeshCenter = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    //sphereMeshCenter.scale.set(2, 2, 2);
+    sphereMeshCenter.scale.set(1.3, 1.3, 1.3);
     scene.add(sphereMeshCenter);
 
     // 針を作成
@@ -52,8 +52,8 @@ window.onload = () => {
         needle.position.set(-Math.cos(angle) * (length / 2 + 13), Math.sin(angle) * (length / 2 + 13), 0);
     }
 
-    const secNeedleLength = 85;
-    const minNeedleLength = 73;
+    const secNeedleLength = 86;
+    const minNeedleLength = 74;
     const hourNeedleLength = 50;
 
     const secNeedle = createNeedle(secNeedleLength, 1);
@@ -101,9 +101,27 @@ window.onload = () => {
         camera.lookAt(new THREE.Vector3(0, 0, 0));
     });
 
+    window.addEventListener('resize', () => {
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+        renderer.setSize(newWidth, newHeight);
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+    });
+
+    window.addEventListener('wheel', (event) => {
+        const delta = event.deltaY > 0 ? 1.1 : 0.9;
+        camera.position.z *= delta;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+    });
+
+
+
     const tick = () => {
         requestAnimationFrame(tick);
         const now = new Date();
+        const todayBegin = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const delta = now.getTime() - todayBegin.getTime();
         const mSec = now.getMilliseconds();
         const sec = now.getSeconds();
         const min = now.getMinutes();
@@ -123,9 +141,13 @@ window.onload = () => {
         sphereMeshHour.position.set(hourX, hourY, 0);
         sphereMeshMin.position.set(minX, minY, 0);
         sphereMeshSec.position.set(secX, secY, 0);
-        sphereMeshSec.rotation.y = (Date.now() / 1000) * Math.PI / 30;
-        sphereMeshMin.rotation.y = (Date.now() / 60000) * Math.PI / 30;
-        sphereMeshHour.rotation.y = (Date.now() / 3600000) * Math.PI / 30;
+        sphereMeshSec.rotation.y = (delta / 60000) * Math.PI * 2;
+        sphereMeshMin.rotation.y = (delta / 3600000) * Math.PI * 2;
+        sphereMeshHour.rotation.y = (delta / 86400000) * Math.PI * 2;
+
+        if (min == 0 && 0 <= sec && sec < 2) {
+            sphereMeshCenter.rotation.y = mSec / 1000 * Math.PI * 2;
+        }
 
         rotateNeedle(secNeedle, secAngle, secNeedleLength);
         rotateNeedle(minNeedle, minAngle, minNeedleLength);

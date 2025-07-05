@@ -1,6 +1,8 @@
 window.onload = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const bgDark = 0x111111;
+    const bgLight = 0xdddddd;
 
     const renderer = new THREE.WebGLRenderer({
         canvas: document.querySelector('#mainCanvas'), 
@@ -10,7 +12,7 @@ window.onload = () => {
     renderer.setSize(width, height);
     
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdddddd);
+    scene.background = new THREE.Color(bgLight);
     const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
     camera.position.set(0, 0, 500);
 
@@ -111,8 +113,25 @@ window.onload = () => {
 
     window.addEventListener('wheel', (event) => {
         const delta = event.deltaY > 0 ? 1.1 : 0.9;
-        camera.position.z *= delta;
+        camera.position.z = Math.max(1, Math.min(5000, delta * camera.position.z));
         camera.lookAt(new THREE.Vector3(0, 0, 0));
+    });
+
+    window.addEventListener('mousedown', (event) => {
+        if (event.button === 0) { // 左クリック
+            // const mouseX = (event.clientX / width) * 2 - 1;
+            // const mouseY = -(event.clientY / height) * 2 + 1;
+            // const raycaster = new THREE.Raycaster();
+            // raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera);
+            // const intersects = raycaster.intersectObjects(scene.children);
+            // if (intersects.length > 0) {
+            //     const intersectedObject = intersects[0].object;
+            //     if (intersectedObject === sphereMeshSec || intersectedObject === sphereMeshMin || intersectedObject === sphereMeshHour) {
+            //         alert('You clicked on a clock sphere!');
+            //     }
+            // }
+            scene.background = scene.background.equals(new THREE.Color(bgLight)) ? new THREE.Color(bgDark) : new THREE.Color(bgLight);
+        }
     });
 
 

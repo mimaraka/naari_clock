@@ -96,14 +96,11 @@ window.onload = () => {
     window.addEventListener('mousemove', (event) => {
         const mouseX = (event.clientX / width) * 2 - 1;
         const mouseY = -(event.clientY / height) * 2 + 1;
-        camera.position.x = Math.log(Math.abs(mouseX)+ 1) * 100 * (mouseX < 0 ? -1 : 1);
-        camera.position.y = Math.log(Math.abs(mouseY)+ 1) * 100 * (mouseY < 0 ? -1 : 1);
+        camera.position.x = Math.log(Math.abs(mouseX)+ 1) * 100 * Math.sign(mouseX);
+        camera.position.y = Math.log(Math.abs(mouseY)+ 1) * 100 * Math.sign(mouseY);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
     });
 
-
-
-    let t = 0;
     const tick = () => {
         requestAnimationFrame(tick);
         const now = new Date();
@@ -111,7 +108,7 @@ window.onload = () => {
         const sec = now.getSeconds();
         const min = now.getMinutes();
         const hour = now.getHours();
-        const secAngle = (sec - (mSec / 1000 - 1) ** 16 + 1) / 60 * Math.PI * 2 + Math.PI / 2;
+        const secAngle = (sec - (mSec / 1000 - 1) ** 16) / 60 * Math.PI * 2 + Math.PI / 2;
         const minAngle = (min + sec / 60 + mSec / 60000) / 60 * Math.PI * 2 + Math.PI / 2;
         const hourAngle = ((hour % 12) / 12) * Math.PI * 2 + (min / 60) * (Math.PI / 6) + Math.PI / 2;
         const radiusSec = 110;
@@ -123,7 +120,6 @@ window.onload = () => {
         const minY = radiusMin * Math.sin(minAngle);
         const hourX = -radiusHour * Math.cos(hourAngle);
         const hourY = radiusHour * Math.sin(hourAngle);
-        t += 0.03;
         sphereMeshHour.position.set(hourX, hourY, 0);
         sphereMeshMin.position.set(minX, minY, 0);
         sphereMeshSec.position.set(secX, secY, 0);

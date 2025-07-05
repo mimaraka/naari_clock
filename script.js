@@ -162,7 +162,7 @@ window.onload = () => {
         sphereMeshSec.position.set(secX, secY, 0);
         sphereMeshSec.rotation.y = (delta / 60000) * Math.PI * 2;
         sphereMeshMin.rotation.y = (delta / 3600000) * Math.PI * 2;
-        sphereMeshHour.rotation.y = (delta / 86400000) * Math.PI * 2;
+        sphereMeshHour.rotation.y = (delta / 43200000) * Math.PI * 2;
 
         if (min == 0 && 0 <= sec && sec < 2) {
             sphereMeshCenter.rotation.y = mSec / 1000 * Math.PI * 2;

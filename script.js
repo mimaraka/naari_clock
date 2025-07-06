@@ -20,7 +20,7 @@ window.onload = () => {
     const sphereMaterial = new THREE.MeshStandardMaterial({
         map: new THREE.TextureLoader().load('naari3.png'),
         metalness: 0.05,
-        roughness: 0.5
+        roughness: 0.7
     });
 
     const sphereMeshSec = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -42,7 +42,7 @@ window.onload = () => {
         const material = new THREE.MeshStandardMaterial({
             map: new THREE.TextureLoader().load('naari3.png'),
             metalness: 0.05,
-            roughness: 0.5
+            roughness: 0.7
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(0, length / 2, 0);
@@ -74,7 +74,7 @@ window.onload = () => {
             //color: i % 5 === 0 ? 0xffffff : 0x888888,
             map: new THREE.TextureLoader().load('naari3.png'),
             metalness: 0.05,
-            roughness: 0.5
+            roughness: 0.7
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(x, y, 0);
@@ -119,17 +119,17 @@ window.onload = () => {
 
     window.addEventListener('mousedown', (event) => {
         if (event.button === 0) { // 左クリック
-            // const mouseX = (event.clientX / width) * 2 - 1;
-            // const mouseY = -(event.clientY / height) * 2 + 1;
-            // const raycaster = new THREE.Raycaster();
-            // raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera);
-            // const intersects = raycaster.intersectObjects(scene.children);
-            // if (intersects.length > 0) {
-            //     const intersectedObject = intersects[0].object;
-            //     if (intersectedObject === sphereMeshSec || intersectedObject === sphereMeshMin || intersectedObject === sphereMeshHour) {
-            //         alert('You clicked on a clock sphere!');
-            //     }
-            // }
+            const mouseX = (event.clientX / width) * 2 - 1;
+            const mouseY = -(event.clientY / height) * 2 + 1;
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera);
+            const intersects = raycaster.intersectObjects(scene.children);
+            if (intersects.length > 0) {
+                const intersectedObject = intersects[0].object;
+                if (intersectedObject === sphereMeshCenter) {
+                    
+                }
+            }
             scene.background = scene.background.equals(new THREE.Color(bgLight)) ? new THREE.Color(bgDark) : new THREE.Color(bgLight);
         }
     });
@@ -138,6 +138,7 @@ window.onload = () => {
 
     const tick = () => {
         requestAnimationFrame(tick);
+        
         const now = new Date();
         const todayBegin = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const delta = now.getTime() - todayBegin.getTime();
@@ -145,9 +146,11 @@ window.onload = () => {
         const sec = now.getSeconds();
         const min = now.getMinutes();
         const hour = now.getHours();
+
         const secAngle = (sec - (mSec / 1000 - 1) ** 16) / 60 * Math.PI * 2 + Math.PI / 2;
         const minAngle = (min + sec / 60 + mSec / 60000) / 60 * Math.PI * 2 + Math.PI / 2;
-        const hourAngle = ((hour % 12) / 12) * Math.PI * 2 + (min / 60) * (Math.PI / 6) + Math.PI / 2;
+        const hourAngle = (hour * 5 + min / 12 + sec / 720 + mSec / 720000) / 60 * Math.PI * 2 + Math.PI / 2;
+
         const radiusSec = 110;
         const radiusMin = 100;
         const radiusHour = 80;
@@ -157,6 +160,7 @@ window.onload = () => {
         const minY = radiusMin * Math.sin(minAngle);
         const hourX = -radiusHour * Math.cos(hourAngle);
         const hourY = radiusHour * Math.sin(hourAngle);
+
         sphereMeshHour.position.set(hourX, hourY, 0);
         sphereMeshMin.position.set(minX, minY, 0);
         sphereMeshSec.position.set(secX, secY, 0);

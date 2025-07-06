@@ -20,7 +20,7 @@ window.onload = () => {
     const sphereMaterial = new THREE.MeshStandardMaterial({
         map: new THREE.TextureLoader().load('naari3.png'),
         metalness: 0.05,
-        roughness: 0.7
+        roughness: 0.65
     });
 
     const sphereMeshSec = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -42,7 +42,7 @@ window.onload = () => {
         const material = new THREE.MeshStandardMaterial({
             map: new THREE.TextureLoader().load('naari3.png'),
             metalness: 0.05,
-            roughness: 0.7
+            roughness: 0.65
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(0, length / 2, 0);
@@ -74,7 +74,7 @@ window.onload = () => {
             //color: i % 5 === 0 ? 0xffffff : 0x888888,
             map: new THREE.TextureLoader().load('naari3.png'),
             metalness: 0.05,
-            roughness: 0.7
+            roughness: 0.65
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(x, y, 0);
@@ -117,6 +117,8 @@ window.onload = () => {
         camera.lookAt(new THREE.Vector3(0, 0, 0));
     });
 
+    let timeCenterBallClicked = 0;
+
     window.addEventListener('mousedown', (event) => {
         if (event.button === 0) { // 左クリック
             const mouseX = (event.clientX / width) * 2 - 1;
@@ -127,7 +129,8 @@ window.onload = () => {
             if (intersects.length > 0) {
                 const intersectedObject = intersects[0].object;
                 if (intersectedObject === sphereMeshCenter) {
-                    
+                    timeCenterBallClicked = Date.now();
+                    return;
                 }
             }
             scene.background = scene.background.equals(new THREE.Color(bgLight)) ? new THREE.Color(bgDark) : new THREE.Color(bgLight);
@@ -138,7 +141,7 @@ window.onload = () => {
 
     const tick = () => {
         requestAnimationFrame(tick);
-        
+
         const now = new Date();
         const todayBegin = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const delta = now.getTime() - todayBegin.getTime();
@@ -168,8 +171,13 @@ window.onload = () => {
         sphereMeshMin.rotation.y = (delta / 3600000) * Math.PI * 2;
         sphereMeshHour.rotation.y = (delta / 43200000) * Math.PI * 2;
 
+        const deltaCenterBallClicked = now - timeCenterBallClicked;
+
         if (min == 0 && 0 <= sec && sec < 2) {
             sphereMeshCenter.rotation.y = mSec / 1000 * Math.PI * 2;
+        }
+        else if (deltaCenterBallClicked < 1000) {
+            sphereMeshCenter.rotation.y = (-((deltaCenterBallClicked / 1000 - 1) ** 4) + 1) * Math.PI * 2;
         }
 
         rotateNeedle(secNeedle, secAngle, secNeedleLength);
